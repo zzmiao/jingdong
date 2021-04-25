@@ -22,3 +22,12 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### 初始化项目样式
+```
+npm install normalize.css --save
+```
+### 添加axios请求
+```
+npm install axios --save
+```
