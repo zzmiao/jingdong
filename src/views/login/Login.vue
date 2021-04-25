@@ -2,8 +2,8 @@
   <div class="wrapper">
     <div class="login">
       <img class="login__icon" src="@/assets/images/login/login_people.png" />
-      <input class="login__input" placeholder="请输入手机号" type="text" />
-      <input class="login__input" placeholder="请输入密码" type="password" />
+      <input class="login__input" v-model="data.username" placeholder="请输入用户名" type="text" />
+      <input class="login__input" v-model="data.password" placeholder="请输入密码" type="password" />
       <div class="login__button" v-on:click="handleLogin">登陆</div>
       <div class="login__tips">
         <span class="login__tips__text" v-on:click="handleRegisterClick">立即注册</span>|<span
@@ -17,24 +17,50 @@
 import {
   useRouter
 } from 'vue-router'
+import axios from 'axios'
+import {
+  reactive
+} from 'vue'
+axios.defaults.headers.post['Content-Type'] = 'application/json'
 export default {
   name: 'Login',
-  data () {
-    return {
-
-    }
-  },
   components: {
 
   },
   setup (props, context) {
     const router = useRouter()
+    const data = reactive({
+      username: '',
+      password: ''
+    })
     // 触发登陆事件
-    const handleLogin = () => {
-      localStorage.setItem('isLogin', true)
-      router.push({
-        name: 'Home'
+    const handleLogin = async () => {
+      const url = 'https://www.fastmock.site/mock/ae8e9031947a302fed5f92425995aa19/jd/'
+      const result = await axios.post(url + 'api/user/login', {
+        username: data.username,
+        password: data.password
       })
+      if (result.data.errno === 0) {
+        localStorage.setItem('isLogin', true)
+        router.push({
+          name: 'Home'
+        })
+      } else {
+        console.log('失败')
+      }
+      console.log(result)
+      // axios.post(url + 'api/user/login', {
+      //   username: data.username,
+      //   password: data.password
+      // }).then((res) => {
+      //   console.log('成功')
+      //   localStorage.setItem('isLogin', true)
+      //   router.push({
+      //     name: 'Home'
+      //   })
+      // }).catch(() => {
+      //   console.log('失败')
+      // })
     }
     // 没有账号去注册
     const handleRegisterClick = () => {
@@ -44,7 +70,8 @@ export default {
     }
     return {
       handleLogin,
-      handleRegisterClick
+      handleRegisterClick,
+      data
     }
   }
 }
