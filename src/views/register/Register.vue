@@ -13,9 +13,7 @@
 </template>
 
 <script>
-import {
-  useRouter
-} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 export default {
   name: 'Register',

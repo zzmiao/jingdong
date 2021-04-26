@@ -10,57 +10,56 @@
           class="login__tips__text">忘记密码</span>
       </div>
     </div>
+    <Toast v-show="data.isShowToast" v-bind:toastMessage="data.toastMessage" />
   </div>
 </template>
 
 <script>
-import {
-  useRouter
-} from 'vue-router'
-import axios from 'axios'
-import {
-  reactive
-} from 'vue'
-axios.defaults.headers.post['Content-Type'] = 'application/json'
+import { useRouter } from 'vue-router'
+import { post } from '../../utils/request.js'
+import { reactive } from 'vue'
+import Toast from '../../components/Toast.vue'
+
 export default {
   name: 'Login',
   components: {
-
+    Toast
   },
   setup (props, context) {
     const router = useRouter()
     const data = reactive({
       username: '',
-      password: ''
+      password: '',
+      isShowToast: false,
+      toastMessage: ''
     })
+    const showToast = (message) => {
+      data.toastMessage = message
+      data.isShowToast = true
+      setTimeout(() => {
+        data.toastMessage = ''
+        data.isShowToast = false
+      }, 3000)
+    }
     // 触发登陆事件
     const handleLogin = async () => {
-      const url = 'https://www.fastmock.site/mock/ae8e9031947a302fed5f92425995aa19/jd/'
-      const result = await axios.post(url + 'api/user/login', {
-        username: data.username,
-        password: data.password
-      })
-      if (result.data.errno === 0) {
-        localStorage.setItem('isLogin', true)
-        router.push({
-          name: 'Home'
+      try {
+        const result = await post('api/user/login', {
+          username: data.username,
+          password: data.password
         })
-      } else {
-        console.log('失败')
+        if (result.errno === 0) {
+          localStorage.setItem('isLogin', true)
+          router.push({ name: 'Home' })
+        } else {
+          console.log('登陆失败')
+          showToast('登陆失败')
+        }
+      } catch (e) {
+        // TODO handle the exception
+        console.log('请求失败')
+        showToast('请求失败')
       }
-      console.log(result)
-      // axios.post(url + 'api/user/login', {
-      //   username: data.username,
-      //   password: data.password
-      // }).then((res) => {
-      //   console.log('成功')
-      //   localStorage.setItem('isLogin', true)
-      //   router.push({
-      //     name: 'Home'
-      //   })
-      // }).catch(() => {
-      //   console.log('失败')
-      // })
     }
     // 没有账号去注册
     const handleRegisterClick = () => {
